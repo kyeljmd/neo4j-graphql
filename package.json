@@ -17,6 +17,7 @@
     "join-monster": "^2.1.1",
     "morgan": "~1.9.1",
     "neo4j-driver": "^4.0.2",
+    "neo4j-graphql-js": "^2.13.0",
     "pg": "^8.0.0"
   }
 }

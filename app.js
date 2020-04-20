@@ -6,6 +6,7 @@ const graphql = require('graphql')
 const models = require("./schema/graphql");
 const schema = new graphql.GraphQLSchema({ query: models.QueryRoot });
 const { ApolloServer, gql } = require('apollo-server-express');
+const{ makeAugmentedSchema } = require('neo4j-graphql-js')
 const app = express();
 app.use(logger('dev'));
 app.use('/api', graphqlHTTP({
