@@ -1,0 +1,22 @@
+from node:13.12.0
+
+WORKDIR /app
+COPY package.json /app
+RUN npm install
+
+ARG DB_HOST
+ARG DB_USER
+ARG DB_NAME 
+ARG DB_PASSWORD
+
+ENV DB_HOST=$DB_HOST
+ENV DB_USER=$DB_USER
+ENV DB_PASSWORD=$DB_PASSWORD
+ENV DB_NAME=$DB_NAME
+
+RUN echo $DB_NAME
+
+EXPOSE 3000
+COPY . /app
+
+CMD npm start
