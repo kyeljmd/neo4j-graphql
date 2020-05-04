@@ -8,8 +8,7 @@ const schema = new graphql.GraphQLSchema({ query: models.QueryRoot });
 const { ApolloServer, gql } = require('apollo-server-express');
 const{ makeAugmentedSchema, augmentSchema} = require('neo4j-graphql-js')
 const {makeExecutableSchema} = require('apollo-server')
-const {typeDefs, resolvers} = require("./schema/schema");
-const neo4j  = require('neo4j-driver');
+const {typeDefs, resolvers, driver} = require("./schema/schema");
 
 const app = express();
 app.use(logger('dev'));
@@ -23,22 +22,17 @@ const apolloTypeDef = typeDefs
 
 // Provide resolver functions for your schema fields
 const apolloResolvers = resolvers
+const execSchema = makeAugmentedSchema({
+  typeDefs,
+  resolvers,
+});
 
-
-const augmentedSchema = makeAugmentedSchema({ typeDefs });
-
-
-
-const driver = neo4j.driver(
-  'bolt://localhost:7687',
-  neo4j.auth.basic('neo4j', '123qwe')
-);
-
-const apolloServer = new ApolloServer({ schema: augmentedSchema,
-  typeDefs: apolloTypeDef, resolvers: apolloResolvers,context:{driver} });
-
+const apolloServer = new ApolloServer({
+  schema: execSchema,
+  typeDefs: apolloTypeDef,
+  resolvers: apolloResolvers,
+  context:{ driver }});
 apolloServer.applyMiddleware({ app });
-
 app.listen({ port: 4000 }, () =>
   console.log(`🚀 Server ready at http://localhost:4000${apolloServer.graphqlPath}`)
 );
