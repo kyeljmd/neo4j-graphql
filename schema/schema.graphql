@@ -106,6 +106,7 @@ type Advisor {
   classificationCode: String
   number: String
   contract: [Contract] @relation(name: "IS_CONTRACT_OF", direction: "IN")
+  contractMetaData: [ContractAdvisor]
   info: [BasicInfo] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
   manager: [Advisor] @relation(name: "REPORTS_TO", direction: "OUT")
   manages: [Advisor] @relation(name: "MANAGES", direction: "OUT")
@@ -140,12 +141,22 @@ type Contract {
   hash: ID!
   costCenterCode: String
   contractDate: String
+  classificationCode: String
   disbursementType: String
   caption: String
   advisorName: String
   currencyCode: String
   manager: [Advisor] @relation(name:"IS_CONTRACT_ASSIGNED_IMMEDIATE_MANAGER", direction: "OUT")
   entity: [Entity] @relation(name: "IS_CONTRACT_ISSUED_BY", direction: "OUT")
+}
+
+
+type ContractAdvisor @relation(name: "IS_CONTRACT_OF", direction: "IN") {
+    classificationCode:String 
+    classificationEffectiveDate: String
+    advisorStatusCode:String
+    advisorStatusEffectiveDate:String
+    contract: [Contract]
 }
 
 type Calendar {
