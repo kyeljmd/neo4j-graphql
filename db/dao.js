@@ -1,10 +1,9 @@
-const neo4j  = require('neo4j-driver');
+const neo4j = require('neo4j-driver');
 const {buildBasicInfoProps} = require('./dao-utils')
 const driver = neo4j.driver(
     'bolt://localhost:7687',
     neo4j.auth.basic('neo4j', '123qwe')
 );  
-
 exports.driver = driver;
 exports.retrieveDistributionChannel = () => {
   let session = driver.session()
@@ -14,12 +13,12 @@ exports.retrieveDistributionChannel = () => {
   WITH v1, value as v2
   CALL apoc.cypher.run("MATCH (e:Entity)<-[ar:IS_AGENT_OF]-(a:Advisor) RETURN count(distinct a) as all",{}) yield value
   WITH v1,v2,value as v3
-  return v1.agency as agency,v2.broker as broker ,v3.all as all`
+  return {agency: v1.agency ,broker: v2.broker, all: v3.all }`
   return session.run(query).then(result => {return result.records.map(record => {
    return {
-        agency: record._fieldLookup.agency,
-        broker: record._fieldLookup.broker,
-        totalActive: record._fieldLookup.all
+        agency: record._fields[0].agency.toNumber(),
+        broker: record._fields[0].broker.toNumber(),
+        totalActive: record._fields[0].all.toNumber()
       }
    })
  })
