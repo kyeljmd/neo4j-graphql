@@ -17,6 +17,7 @@ ENV DB_NAME=$DB_NAME
 RUN echo $DB_NAME
 
 EXPOSE 3000
+EXPOSE 4000
 COPY . /app
 
 CMD npm start

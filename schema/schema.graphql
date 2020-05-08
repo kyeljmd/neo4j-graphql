@@ -1,43 +1,34 @@
-type BasicInfo {
-  hash: ID!
+type BasicProfile {
+  agentCode: ID!
+  createdDate: Date
+  effectiveDate: Date
   lastName: String
   nickName: String
+  displayName: String
   companyName: String
+  middleName: String
   birthDate: String
   titleCode: String
   birthPlace: String
   firstName: String
   number: String
   nationalityCode: String
-  genderCode: String
+  gender: String
   classificationCode: String
+  profileType: String
   civilStatusCode: String
   profileTypeCode: String
-  middleName: String
-  effectiveDate: String
   suffixCode: String
-  fullName: String
 }
 
 type Team {
-  hash: ID!
-  costCenterCode: String
-  costCenterTeamFlag: String
-  code: String
-  cityCode: String
-  provinceCode: String
-  postalCode: String
-  contactInfoTxt: String
-  distChannelCode: String
-  typeCode: String
-  createdDate: String
-  streetAddress: String
-  countryCode: String
-  name: String
-  longCode: String
-  effectiveDate: String
-  remarks: String
-  longName: String
+  code: ID!
+  createdDate: Date
+  displayName: String
+  teamTypeCode: String
+  shortTeamName: String
+  effectiveDate: Date
+  statusCode: String
   unit: [Team] @relation(name: "BELONGS_TO_BRANCH", direction: "OUT")
   members: [Team] @relation(name: "BRANCH_HAS_TEAM", direction: "OUT")
   advisors: [Advisor] @relation(name: "MEMBER_OF", direction: "OUT")
@@ -46,12 +37,30 @@ type Team {
 }
 
 
+type TeamHierarchy{ 
+  costCenterCode: String
+  distributionChannelCode: String
+  entityCode: String
+  code: ID!
+  displayName: String
+  teamCode: String
+  shortTeamName: String
+  longTeamName: String
+  createdDate: Date
+  longTeamCode: String
+  teamTypeCode: String
+  effectiveDate: Date
+  costCenterFlag: String
+  statusCode: String
+}
+
 type Entity {
-  name: String
-  code: String
+  code: ID!
+  displayName: String
+  entityName: String
   createdDate: String
-  hash: ID!
   effectiveDate: String
+  statusCode: String
   branches: [Team] @relation(name: "ENTITY_HAS_BRANCH", direction: "OUT")
   contracts: [Contract] @relation(name: "IS_CONTRACT_ISSUED_BY", direction: "IN")
   recruits: [Entity] @relation(name: "IS_RECRUIT_OF", direction: "IN")
@@ -61,11 +70,12 @@ type Entity {
 }
 
 type Recruit {
-  hash: ID!
-  caption: String
-  classificationCode: String
-  number: String
-  info: [BasicInfo] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+  info: [BasicProfile] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
   contactNumber: [ContactInfo] @relation(name: "HAS_MOBILE", direction: "OUT")
   email: [ContactInfo] @relation(name: "HAS_EMAIL", direction: "OUT")
   address: [Address] @relation(name: "LIVES_IN", direction: "OUT")
@@ -73,15 +83,75 @@ type Recruit {
   recruitmentInfo: [Task] @relation(name: "IS_TASK_TO", direction: "IN")
 }
 
-type Identification {
-  type: String
+
+
+type SpecialIDInfo {
+  code: ID!
+  createdDate: Date!
+  agentCode: String
+  displayName: String
   value: String
-  hash: ID!
+  effectiveDate: Date
+  idTypeCode: String
+  statusCode: String
 }
 
-type ContactInfo {
-  type: String
+type License {
+  licenseRenewalDate: String
+  entityCode: String
+  code: ID!
+  agentCode: String
+  displayName: String
+  licenseTypeCode: String
+  licenseSurrenderDate: String
+  provisionalAuthorityEffectiveDate: String
+  licenseType: String
+  licenseExpiryDate: Date
+  createdDate: Date
+  actualLicenseEffectiveDate: Date
+  effectiveDate: Date
+  remarks: String
+  statusCode: String
+}
+
+type Override {
+  entityCode: String
+  code: String
+  createdDate: Date
+  agentCode: String
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type ContactInfo  {
+  code: ID!
+  createdDate: String
+  contactTypeCode: String
+  agentCode: String
+  displayName: String
+  contactType: String
   value: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type AddressInfo{
+  addressType: String
+  addressTypeCode: String
+  agentCode: String
+  cityCode: String
+  code: String
+  country: String
+  countryCode: String
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  postalCode: String
+  province:  String
+  provinceCode: String
+  statusCode: String
+  streetAddress: String
 }
 
 type Address{
@@ -101,19 +171,20 @@ type Workflow {
 }
 
 type Advisor {
-  hash: ID!
-  caption: String
+  code: ID!
+  createdDate: Date
+  effectiveDate: Date
+  displayName: String
   classificationCode: String
-  number: String
-  contract: [Contract] @relation(name: "IS_CONTRACT_OF", direction: "IN")
-  contractMetaData: [ContractAdvisor]
-  info: [BasicInfo] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
+  statusCode: String
+  contracts: [ContractAdvisor]
+  info: [BasicProfile] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
   manager: [Advisor] @relation(name: "REPORTS_TO", direction: "OUT")
   manages: [Advisor] @relation(name: "MANAGES", direction: "OUT")
   team: [Team] @relation(name: "MEMBER_OF", direction: "OUT")
   entity: [Entity] @relation(name: "IS_AGENT_OF", direction: "OUT")
-  tin: [Identification] @relation(name: "HAS_TIN", direction: "OUT")
-  sss: [Identification] @relation(name: "HAS_SSS", direction: "OUT")  
+  tin: [SpecialIDInfo] @relation(name: "HAS_TIN", direction: "OUT")
+  sss: [SpecialIDInfo] @relation(name: "HAS_SSS", direction: "OUT")  
   mobileNumber: [ContactInfo] @relation(name: "HAS_MOBILE", direction: "OUT")
   homeNumber: [ContactInfo] @relation(name: "HAS_PHONE", direction: "OUT")
   email: [ContactInfo] @relation(name: "HAS_EMAIL", direction: "OUT")
@@ -138,25 +209,170 @@ type Task @additionalLabels(labels: ["Recruitment"]) {
 }
 
 type Contract {
-  hash: ID!
-  costCenterCode: String
-  contractDate: String
+  code: ID!
+  classificationEffectiveDate: Date
+  distributionChannelCode: String
+  entityCode: String
+  immediateManagerEffectiveDate: Date
+  agentCode: String
+  displayName: String
+  unitEffectiveDate: Date
+  classification: Date
+  contractEffectiveDate: Date
   classificationCode: String
-  disbursementType: String
-  caption: String
-  advisorName: String
-  currencyCode: String
-  manager: [Advisor] @relation(name:"IS_CONTRACT_ASSIGNED_IMMEDIATE_MANAGER", direction: "OUT")
-  entity: [Entity] @relation(name: "IS_CONTRACT_ISSUED_BY", direction: "OUT")
+  createdDate: Date
+  distributionChannel: String
+  effectiveDate: Date
+  statusCode: String
+  advisors: [ContractAdvisor]
+}
+
+type AdvisorHierarchy{
+  code: ID!
+  entityCode: String
+  immediateManager: String
+  contractCode: String
+  agentCode: String
+}
+
+type AdvisorHierarchyLevel {
+  code: ID!
+  entityCode: String
+  level: String
+  managerCode: String
+  managerClassificationCode: String
+  agentCode: String
+}
+
+type BankAccount {
+ code: ID!
+ bankAccountName: String
+ createdDate: String
+ agentCode: String
+ displayName: String
+ bankAccountNumber: String
+ effectiveDate: Date 
+ statusCode: String
+}
+
+type Bonus {
+  entityCode: String
+  code: ID!
+  createdDate: Date
+  agentCode: String
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Classification {
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Commission {
+  entityCode: String
+  code: ID!
+  createdDate: Date
+  agentCode: String
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Credit {
+  entityCode: String
+  code: ID!
+  createdDate: Date
+  agentCode: String
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type DistributionChannel {
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Employee {
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Disbursement {
+  bankCode: String
+  entityCode: String
+  code: ID!
+  createdDate: Date
+  agentCode: String
+  displayName: String
+  disbursementMethodCode: String
+  bankName: String
+  accountNumber: String
+  disbursementMethod: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Payroll {
+  entityCode: String  
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+  agentCode: String
+}
+
+type Policy {
+  code: String
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Product {
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+}
+
+type Rate {
+  code: ID!
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+  value: String
+}
+
+type Transaction {
+  createdDate: Date
+  displayName: String
+  effectiveDate: Date
+  statusCode: String
+  amount: String
 }
 
 
-type ContractAdvisor @relation(name: "IS_CONTRACT_OF", direction: "IN") {
-    classificationCode:String 
-    classificationEffectiveDate: String
-    advisorStatusCode:String
-    advisorStatusEffectiveDate:String
-    contract: [Contract]
+type Period {
+  entityCode: String
+  code: String
+  startDate: Date
+  cutoffDate: String
 }
 
 type Calendar {
@@ -165,6 +381,7 @@ type Calendar {
   cutoffYear: String
   cutOffParams: [Calendar] @relation(name: "IS_REPORT_CUTOFFPARAMS_FOR", direction: "OUT")
 }
+
 
 type Report @additionalLabels(labels: ["RecruitmentTarget"]) {
   cutoffYear: String
@@ -181,6 +398,26 @@ type Level {
 type HierarchyTree {
   level: Level!
   advisor:Advisor!
+}
+
+type DistributionChannel{
+  agency: String
+  broker: String
+  totalActive: String
+}
+
+# relationships
+type ContractAdvisor @relation(name: "IS_CONTRACT_OF"){
+    classificationCode:String 
+    classificationEffectiveDate: Date
+    advisorStatusCode:String
+    advisorStatusEffectiveDate:String
+    to: [Advisor]
+    from: [Contract]
+}
+
+type Query{
+  distributionChannel:[DistributionChannel]
 }
 
 type Mutation {

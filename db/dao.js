@@ -90,6 +90,7 @@ exports.retrieveHierarchyUpwards = (hash) => {
 }
 
 exports.retrieveHierarchyDownwards = (hash) => {
+  let session = driver.session()
   let jampackedQuery = 
   `
   MATCH (n:Advisor {hash: '${hash}'})<-[r:REPORTS_TO]-(o:Advisor)
