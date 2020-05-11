@@ -1,4 +1,4 @@
-type BasicProfile {
+type BasicInfo {
   agentCode: ID!
   createdDate: Date
   effectiveDate: Date
@@ -29,7 +29,6 @@ type Team {
   shortTeamName: String
   effectiveDate: Date
   statusCode: String
-  unit: [Team] @relation(name: "BELONGS_TO_BRANCH", direction: "OUT")
   members: [Team] @relation(name: "BRANCH_HAS_TEAM", direction: "OUT")
   advisors: [Advisor] @relation(name: "MEMBER_OF", direction: "OUT")
   entity: [Entity] @relation(name: "ENTITY_HAS_BRANCH", direction: "IN")
@@ -58,15 +57,9 @@ type Entity {
   code: ID!
   displayName: String
   entityName: String
-  createdDate: String
-  effectiveDate: String
+  createdDate: Date
+  effectiveDate: Date
   statusCode: String
-  branches: [Team] @relation(name: "ENTITY_HAS_BRANCH", direction: "OUT")
-  contracts: [Contract] @relation(name: "IS_CONTRACT_ISSUED_BY", direction: "IN")
-  recruits: [Entity] @relation(name: "IS_RECRUIT_OF", direction: "IN")
-  reportRecruitments: [Report] @relation(name: "IS_REPORT_RECRUITMENT_OF", direction: "IN")
-  mobileNumber: [ContactInfo] @relation(name: "HAS_MOBILE", direction: "IN")
-  homeNumber: [ContactInfo] @relation(name: "HAS_PHONE", direction: "IN")
 }
 
 type Recruit {
@@ -75,10 +68,10 @@ type Recruit {
   displayName: String
   effectiveDate: Date
   statusCode: String
-  info: [BasicProfile] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
+  info: [BasicInfo] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
   contactNumber: [ContactInfo] @relation(name: "HAS_MOBILE", direction: "OUT")
   email: [ContactInfo] @relation(name: "HAS_EMAIL", direction: "OUT")
-  address: [Address] @relation(name: "LIVES_IN", direction: "OUT")
+  address: [AddressInfo] @relation(name: "LIVES_IN", direction: "OUT")
   entity: [Entity] @relation(name: "IS_RECRUIT_OF", direction: "OUT")
   recruitmentInfo: [Task] @relation(name: "IS_TASK_TO", direction: "IN")
 }
@@ -139,7 +132,7 @@ type ContactInfo  {
 type AddressInfo{
   addressType: String
   addressTypeCode: String
-  agentCode: String
+  agentCode: ID!
   cityCode: String
   code: String
   country: String
@@ -177,18 +170,18 @@ type Advisor {
   displayName: String
   classificationCode: String
   statusCode: String
-  contracts: [ContractAdvisor]
-  info: [BasicProfile] @relation(name: "IS_BASIC_INFO_OF", direction: "IN")
-  manager: [Advisor] @relation(name: "REPORTS_TO", direction: "OUT")
-  manages: [Advisor] @relation(name: "MANAGES", direction: "OUT")
-  team: [Team] @relation(name: "MEMBER_OF", direction: "OUT")
-  entity: [Entity] @relation(name: "IS_AGENT_OF", direction: "OUT")
-  tin: [SpecialIDInfo] @relation(name: "HAS_TIN", direction: "OUT")
-  sss: [SpecialIDInfo] @relation(name: "HAS_SSS", direction: "OUT")  
-  mobileNumber: [ContactInfo] @relation(name: "HAS_MOBILE", direction: "OUT")
-  homeNumber: [ContactInfo] @relation(name: "HAS_PHONE", direction: "OUT")
-  email: [ContactInfo] @relation(name: "HAS_EMAIL", direction: "OUT")
-  address: [Address] @relation(name: "LIVES_IN", direction: "OUT")
+  contracts: [Contract] @relation(name: "HAS_CONTRACT", direction: "OUT")
+  info: BasicInfo @relation(name: "HAS_BASIC_PROFILE", direction: "OUT")
+  manages: [Advisor]
+  @cypher
+  (statement: 
+  "MATCH (a:AdvisorHierarchy)<-[r:REPORTS_TO]-(o:AdvisorHierarchy)-[r1:HAS_LEVEL]->(o1:AdvisorHierarchyLevel) MATCH (a1: Advisor) where a.agentCode=this.code AND o.agentCode=a1.code  RETURN distinct a1")
+  entities: [Entity] @cypher(statement: "MATCH (this)-[rc:HAS_CONTRACT]->(n:AdvisorContract)-[r]->(v:Entity) RETURN v")
+  ids: [SpecialIDInfo] @relation(name: "HAS_SPECIAL_ID_INFO", direction: "OUT")
+  addresses: [AddressInfo] @relation(name: "HAS_ADDRESS_INFO", direction: "OUT")
+  contactInfo:[ContactInfo] @relation(name: "HAS_CONTACT_INFO", direction: "OUT")
+  licenses: [License] @relation(name: "HAS_LICENSE", direction: "OUT")
+  disbursement: [Disbursement] @relation(name:"HAS_DISBURSEMENT", direction: "OUT")
   hierarchyUpwards: [HierarchyTree] @neo4j_ignore
   hierarchyDownwards: [HierarchyTree] @neo4j_ignore
 }
@@ -217,13 +210,17 @@ type Contract {
   agentCode: String
   displayName: String
   unitEffectiveDate: Date
-  classification: Date
+  classification: String
   contractEffectiveDate: Date
   classificationCode: String
   createdDate: Date
   distributionChannel: String
   effectiveDate: Date
   statusCode: String
+  entities: [Entity] @relation(name: "HAS_ENTITY", direction: "OUT")
+  branch: [Team] @relation(name:"HAS_TEAM", direction: "OUT")
+  unit: [Team] @relation(name:"HAS_UNIT", direction: "OUT")
+  manager: [Advisor] @cypher(statement: "MATCH(this)<-[:IS_HIERARCHY_IN_CONTRACT]-(o)<-[:HAS_ADVISOR_HIERARCHY]-(kl:Advisor) RETURN kl")
   advisors: [ContractAdvisor]
 }
 
