@@ -1150,7 +1150,7 @@ CREATE (TRXN1COMOV_LV2)-[:BREAKDOWN_OF]->(TRXN1COMBONUS)
 
 CREATE (A58756PAY)-[:INCLUDES]->(TRXN1COMBONUS)
 
-
+    
 //CutOff Params
 
 CREATE (CutOff1:CutOffParam  { type: 'ACPYR', startDate: date('2019-12-19'), endDate: date('2020-01-10')})
