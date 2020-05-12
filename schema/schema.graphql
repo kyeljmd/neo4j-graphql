@@ -60,6 +60,9 @@ type Entity {
   createdDate: Date
   effectiveDate: Date
   statusCode: String
+  totalActiveAgency: Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'A' and c.distributionChannelCode='CAN' RETURN count(distinct a)")
+  totalActiveBroker: Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'A' and c.distributionChannelCode='BRO' RETURN count(distinct a)")
+  totalActive: Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'A' RETURN count(distinct a)")
 }
 
 type Recruit {
@@ -172,6 +175,7 @@ type Advisor {
   statusCode: String
   contracts: [Contract] @relation(name: "HAS_CONTRACT", direction: "OUT")
   info: BasicInfo @relation(name: "HAS_BASIC_PROFILE", direction: "OUT")
+  manager: [Advisor] @cypher(statement: "MATCH (this)-[:HAS_ADVISOR_HIERARCHY]->(:AdvisorHierarchy)-[:REPORTS_TO]->(:AdvisorHierarchy)<-[HAS_ADVISOR_HIERARCHY]-(manager:Advisor) WHERE  this.code <> manager.code RETURN manager")
   manages: [Advisor]
   @cypher
   (statement: 

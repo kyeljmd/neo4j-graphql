@@ -1,12 +1,31 @@
 const neo4j = require('neo4j-driver');
 const {buildBasicInfoProps} = require('./dao-utils')
-const driver = neo4j.driver(
-    'bolt://localhost:7687',
+let NEO4J_HOST = process.env.NEO4J_HOST
+
+let driver = null;
+
+console.log(NEO4J_HOST)
+if(NEO4J_HOST) {
+  driver = neo4j.driver(
+    NEO4J_HOST,
+    neo4j.auth.basic('neo4j', '123qwe') );
+}else {
+  console.log("using default")
+  driver = neo4j.driver(
+    'bolt://127.0.0.1:7687',
     neo4j.auth.basic('neo4j', '123qwe')
-);  
+);
+}
+
 exports.driver = driver;
 exports.retrieveDistributionChannel = () => {
   let session = driver.session()
+
+  let queryForDistChannel = `MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)  
+  WHERE a.statusCode = 'A' and c.distributionChannelCode='CAN'
+  RETURN count(distinct a)`
+
+
   let query = `CALL apoc.cypher.run("MATCH (e:Entity)<-[ar:IS_AGENT_OF]-(a:Advisor)-[r:MEMBER_OF]->(t:Team) WHERE t.distChannelCode='CAN' and ar.statusCode='A' RETURN count(distinct a) as agency",{}) yield value
   WITH value as v1
   CALL apoc.cypher.run("MATCH (e:Entity)<-[ar:IS_AGENT_OF]-(a:Advisor)-[r:MEMBER_OF]->(t:Team) WHERE t.distChannelCode='BRO' and ar.statusCode='A' RETURN count(distinct a) as broker",{}) yield value
