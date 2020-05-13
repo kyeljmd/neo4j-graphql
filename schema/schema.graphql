@@ -230,7 +230,6 @@ type Contract {
   branch: [Team] @relation(name:"HAS_TEAM", direction: "OUT")
   unit: [Team] @relation(name:"HAS_UNIT", direction: "OUT")
   manager: [Advisor] @cypher(statement: "MATCH(this)<-[:IS_HIERARCHY_IN_CONTRACT]-(o)<-[:HAS_ADVISOR_HIERARCHY]-(kl:Advisor) RETURN kl")
-  advisors: [ContractAdvisor]
 }
 
 type AdvisorHierarchy{
@@ -410,16 +409,6 @@ type DistributionChannel{
   agency: String
   broker: String
   totalActive: String
-}
-
-# relationships
-type ContractAdvisor @relation(name: "IS_CONTRACT_OF"){
-    classificationCode:String 
-    classificationEffectiveDate: Date
-    advisorStatusCode:String
-    advisorStatusEffectiveDate:String
-    to: [Advisor]
-    from: [Contract]
 }
 
 type CutOffParam {
