@@ -63,6 +63,11 @@ type Entity {
   totalActiveAgency: Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'A' and c.distributionChannelCode='CAN' RETURN count(distinct a)")
   totalActiveBroker: Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'A' and c.distributionChannelCode='BRO' RETURN count(distinct a)")
   totalActive: Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'A' RETURN count(distinct a)")
+  activeCodedAdvisorsYearTodate: Int @cypher(statement: "MATCH (a:Advisor)-[:HAS_CONTRACT]->(c:Contract) MATCH (cop:CutOffParam {type: 'ACBON', status: 'C'}) WHERE c.entityCode = this.code and c.contractEffectiveDate.year <= cop.endDate.year RETURN count(distinct a)")
+  activeCodedAdvisorsMonthToDate: Int @cypher(statement: "MATCH (a:Advisor)-[:HAS_CONTRACT]->(c:Contract) MATCH (cop:CutOffParam {type: 'ACBON', status:'C'}) WHERE a.statusCode='A' and c.entityCode = 'ENTITY_01' and c.contractEffectiveDate > cop.startDate and c.contractEffectiveDate <= cop.endDate RETURN count(distinct a)")
+  cancelledCodedAdvisorsYearTodate: Int @cypher(statement: "MATCH (a:Advisor)-[:HAS_CONTRACT]->(c:Contract) MATCH (cop:CutOffParam {type: 'ACBON', status: 'C'}) WHERE a.statusCode='C' and c.entityCode = this.code and c.contractEffectiveDate.year <= cop.endDate.year RETURN count(distinct a)")
+  cancelledCodedAdvisorsMonthToDate: Int @cypher(statement: "MATCH (a:Advisor)-[:HAS_CONTRACT]->(c:Contract) MATCH (cop:CutOffParam {type: 'ACBON', status:'C'}) WHERE a.statusCode='C' and c.entityCode = 'ENTITY_01' and c.contractEffectiveDate > cop.startDate and c.contractEffectiveDate <= cop.endDate RETURN count(distinct a)")
+  vestedAdvisors:  Int @cypher(statement: "MATCH (a:Advisor)-[hc:HAS_CONTRACT]->(c:Contract)-[he:HAS_ENTITY]->(this) WHERE a.statusCode = 'V' RETURN count(distinct a)")
 }
 
 type Recruit {
@@ -416,6 +421,22 @@ type ContractAdvisor @relation(name: "IS_CONTRACT_OF"){
     to: [Advisor]
     from: [Contract]
 }
+
+type CutOffParam {
+  type: String
+  startDate: Date
+  endDate: Date
+  status: String
+  cutOffYear: Int
+  cutOffMonth: Int
+  weekendFlag: Int
+  midMonthFlag: Int
+  monthEndFlag: Int
+  quarterEndFlag: Int
+  midYear: Int 
+  yearEnd: Int
+}
+
 
 type Query{
   distributionChannel:[DistributionChannel]
